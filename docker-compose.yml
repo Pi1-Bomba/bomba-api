@@ -1,0 +1,15 @@
+version: '3'
+services:
+
+  bomba-api:
+    container_name: bomba-api
+    build:
+      context: ./server
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./server:/usr/src/bomba-api
+      - /usr/src/bomba-api/node_modules
+    ports:
+      - '3000:3000'
+    expose:
+      - 3000
