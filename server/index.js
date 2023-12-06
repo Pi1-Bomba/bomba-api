@@ -4,8 +4,7 @@ import express from "express";
 
 import "./loadEnv.js";
 import db from "./database/connection.js";
-import { ObjectId } from "mongodb";
-import formatDocument from "./utils/formatDocument.js";
+import validateData from "./utils/validateData.js";
 
 const port = process.env.PORT;
 
@@ -13,7 +12,7 @@ var app = express();
 
 app.use(express.json());
 
-app.get("/lancamentos", async (req, res) => {
+app.get(["/", "/lancamentos"], async (req, res) => {
   let collection = db.collection("lancamentos");
   try {
     let results = await collection.find({}).limit(50).toArray();
@@ -27,7 +26,8 @@ app.get("/lancamentos", async (req, res) => {
 app.get("/lancamento/:id", async (req, res) => {
   let collection = db.collection("lancamentos");
   const { id } = req.params;
-  const query = { _id:  new ObjectId(id) };
+
+  const query = { idLancamento: Number(id) };
   try {
     let result = await collection.findOne(query);
     res.status(200).send(result);
@@ -38,13 +38,16 @@ app.get("/lancamento/:id", async (req, res) => {
 });
 
 app.post("/lancamento", async (req, res) => {
-  const { rawData } = req.query;
-  console.log(rawData)
-  const newDocument = formatDocument(rawData);
+  const data = req.body;
+
+  if(!validateData(data)){
+    return res.status(400).send("Formato inválido!");
+  }
+
   let collection = db.collection("lancamentos");
   try {
-    let result = await collection.insertOne(newDocument);
-    res.status(204).send(result);
+    let result = await collection.insertOne(data);
+    res.status(201).send(result);
   } catch (e) {
     console.log(e);
     res.status(500).send("Erro!");
@@ -54,7 +57,7 @@ app.post("/lancamento", async (req, res) => {
 app.delete("/lancamento/:id", async (req, res) => {
   let collection = db.collection("lancamentos");
   const { id } = req.params;
-  const query = { _id:  new ObjectId(id) };
+  const query = { idLancamento: id };
   try {
     let result = await collection.deleteOne(query);
     res.status(200).send(result);
