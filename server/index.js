@@ -4,7 +4,7 @@ import express from "express";
 
 import "./loadEnv.js";
 import db from "./database/connection.js";
-import validateData from "./utils/validateData.js";
+//import validateData from "./utils/validateData.js";
 
 const port = process.env.PORT;
 
@@ -40,9 +40,9 @@ app.get("/lancamento/:id", async (req, res) => {
 app.post("/lancamento", async (req, res) => {
   const data = req.body;
 
-  if(!validateData(data)){
-    return res.status(400).send("Formato inválido!");
-  }
+  //if(!validateData(data)){
+  //  return res.status(400).send("Formato inválido!");
+  //}
 
   let collection = db.collection("lancamentos");
   try {
